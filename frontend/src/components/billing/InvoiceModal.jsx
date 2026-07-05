@@ -1,6 +1,5 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
-
+import autoTable from "jspdf-autotable";
 export default function InvoiceModal({ invoice, onClose }) {
   if (!invoice) return null;
 
@@ -19,7 +18,7 @@ export default function InvoiceModal({ invoice, onClose }) {
     doc.text(`Customer: ${customer}`, 14, 40);
     doc.text(`Payment Method: ${payment_method}`, 14, 46);
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 54,
       head: [["Product", "Qty", "Unit Price", "Subtotal"]],
       body: items.map((item) => [
@@ -32,7 +31,7 @@ export default function InvoiceModal({ invoice, onClose }) {
 
     const finalY = doc.lastAutoTable.finalY || 60;
     doc.setFontSize(13);
-    doc.text(`Grand Total: Rs.${grand_total.toFixed(2)}`, 14, finalY + 12);
+    doc.text(`Grand Totalconst finalY = doc.lastAutoTable?.finalY ?? 60;: Rs.${grand_total.toFixed(2)}`, 14, finalY + 12);
 
     doc.save(`${invoice_number}.pdf`);
   };
