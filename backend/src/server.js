@@ -1,4 +1,6 @@
 import productRoutes from "./routes/productRoutes.js";
+import customerRoutes from "./routes/customerRoutes.js";
+import salesRoutes from "./routes/salesRoutes.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -18,6 +20,8 @@ app.get("/", (req, res) => {
     message: "Backend is running 🚀"
   });
 });
+app.use("/api/sales", salesRoutes);
+app.use("/api/customers", customerRoutes);
 app.use("/api/products", productRoutes);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

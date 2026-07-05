@@ -85,3 +85,77 @@ if (eventError) {
     });
   }
 };
+export const getInventory = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select(`
+        product_id,
+        barcode,
+        name,
+        category,
+        selling_price,
+        inventory (
+          current_quantity,
+          low_stock_threshold,
+          last_updated
+        )
+      `);
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+export const getLowStock = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("inventory")
+      .select(`
+        current_quantity,
+        low_stock_threshold,
+        last_updated,
+        products (
+          product_id,
+          barcode,
+          name,
+          category,
+          selling_price
+        )
+      `);
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+
+    const lowStock = data.filter(
+      (item) => item.current_quantity <= item.low_stock_threshold
+    );
+
+    res.json({
+      success: true,
+      data: lowStock,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
