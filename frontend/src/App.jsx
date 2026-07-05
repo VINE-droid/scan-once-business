@@ -3,6 +3,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import InventoryPage from "./pages/InventoryPage";
 import Billing from "./pages/Billing";
 import ReceivingPage from "./pages/ReceivingPage";
+import AddProduct from "./pages/AddProduct";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
           {/* Default route */}
           <Route path="/" element={<Navigate to="/inventory" replace />} />
           <Route path="/receive" element={<ReceivingPage />} />
-
+<Route path="/add-product" element={<AddProduct />} />
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/billing" element={<Billing />} />
         </Routes>
