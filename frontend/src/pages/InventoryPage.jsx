@@ -1,27 +1,41 @@
 import { useEffect, useState } from "react";
 import InventoryTable from "../components/inventory/InventoryTable";
-import { getAllProducts } from "../services/inventoryService";
+import { getInventory } from "../services/inventoryService";
 function InventoryPage() {
     const [products, setProducts] = useState([]);
 const [loading, setLoading] = useState(true);
   const summaryCards = [
-    {
-  title: "Total Products",
-  value: loading ? "..." : products.length,
-},
-    {
-      title: "Low Stock",
-      value: 0,
-    },
-    {
-      title: "Out of Stock",
-      value: 0,
-    },
-  ];
+  {
+    title: "Total Products",
+    value: loading ? "..." : products.length,
+  },
+  {
+    title: "Low Stock",
+    value: loading
+      ? "..."
+      : products.filter(
+          (p) =>
+            p.inventory &&
+            p.inventory.current_quantity <=
+              p.inventory.low_stock_threshold &&
+            p.inventory.current_quantity > 0
+        ).length,
+  },
+  {
+    title: "Out of Stock",
+    value: loading
+      ? "..."
+      : products.filter(
+          (p) =>
+            p.inventory &&
+            p.inventory.current_quantity === 0
+        ).length,
+  },
+];
   useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const response = await getAllProducts();
+      const response = await getInventory();
       setProducts(response.data);
     } catch (error) {
       console.error("Failed to fetch products:", error);
