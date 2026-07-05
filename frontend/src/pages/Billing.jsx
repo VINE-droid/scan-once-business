@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScanInput from "../components/billing/ScanInput";
 import Cart from "../components/billing/Cart";
 import CheckoutPanel from "../components/billing/CheckoutPanel";
@@ -6,23 +6,39 @@ import InvoiceModal from "../components/billing/InvoiceModal";
 import {
   getProductByBarcode,
   submitSale,
-  getMockCustomers,
+  getCustomers,
 } from "../services/billingService";
 
-const customers = getMockCustomers();
+
 
 export default function Billing() {
   const [cartItems, setCartItems] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [scanLoading, setScanLoading] = useState(false);
   const [scanError, setScanError] = useState("");
 
   const [selectedCustomerId, setSelectedCustomerId] = useState(
-    customers[0].id
+    customers[0]?.customer_id ?? ""
   );
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [invoice, setInvoice] = useState(null);
+useEffect(() => {
+  const fetchCustomers = async () => {
+    try {
+      const response = await getCustomers();
+      setCustomers(response.data);
 
+      if (response.data.length > 0) {
+        setSelectedCustomerId(response.data[0].customer_id);
+      }
+    } catch (err) {
+      console.error("Failed to load customers:", err);
+    }
+  };
+
+  fetchCustomers();
+}, []);
   const grandTotal = cartItems.reduce(
     (sum, item) => sum + item.unit_price * item.quantity,
     0
@@ -78,8 +94,9 @@ export default function Billing() {
     if (cartItems.length === 0) return;
     setCheckoutLoading(true);
 
-    const customer = customers.find((c) => c.id === Number(selectedCustomerId));
-
+   const customer = customers.find(
+    (c) => c.customer_id === Number(selectedCustomerId)
+);
     try {
       const res = await submitSale({
         items: cartItems,
@@ -107,7 +124,7 @@ export default function Billing() {
     setInvoice(null);
     setCartItems([]);
     setPaymentMethod("Cash");
-    setSelectedCustomerId(customers[0].id);
+    setSelectedCustomerId(customers[0]?.customer_id ?? "");
   };
 
   return (

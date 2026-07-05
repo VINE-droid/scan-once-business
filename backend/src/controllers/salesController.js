@@ -167,10 +167,13 @@ if (payment_method.toUpperCase() === "CREDIT") {
   }
 }
     res.json({
-      success: true,
-      message: "Sale created successfully",
-      data: sale,
-    });
+  success: true,
+  message: "Sale created successfully",
+  data: {
+    ...sale,
+    invoice_number: `INV-${sale.sale_id}`,
+  },
+});
 
   } catch (err) {
     res.status(500).json({
