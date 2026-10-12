@@ -146,11 +146,11 @@ export const createProduct = async (req, res) => {
 // GET next available barcode
 export const generateBarcode = async (req, res) => {
   try {
+    // Fetch all barcodes to determine the highest number safely, 
+    // or fetch ordered by casting if using Postgres, but a safe JS fallback works too:
     const { data, error } = await supabase
       .from("products")
-      .select("barcode")
-      .order("barcode", { ascending: false })
-      .limit(1);
+      .select("barcode");
 
     if (error) {
       return res.status(500).json({
@@ -161,10 +161,14 @@ export const generateBarcode = async (req, res) => {
 
     let nextBarcode = "8901001";
 
-    if (data.length > 0) {
-      const highest = parseInt(data[0].barcode);
+    if (data && data.length > 0) {
+      // Find the max integer value among existing barcodes
+      const validNumbers = data
+        .map(row => parseInt(row.barcode, 10))
+        .filter(num => !isNaN(num));
 
-      if (!isNaN(highest)) {
+      if (validNumbers.length > 0) {
+        const highest = Math.max(...validNumbers);
         nextBarcode = String(highest + 1);
       }
     }
